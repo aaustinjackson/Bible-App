@@ -13,7 +13,7 @@ st.markdown("""
     border-radius: 10px;
     background-color: #f5f5f5;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    color: black; /* Ensure text is black on light card */
+    color: black; /* Ensure text is black */
 }
 .card:hover {
     background-color: #e0f7fa;
@@ -27,7 +27,7 @@ st.markdown("""
     color: #555;
 }
 body, .stText, .stTextArea, .stTextInput {
-    color: black !important; /* Ensure text is black in dark mode */
+    color: black !important; /* Ensure text is visible in dark mode */
 }
 </style>
 """, unsafe_allow_html=True)
@@ -85,17 +85,22 @@ if st.session_state.selected_topic == "":
     st.subheader("Topics")
     cols = st.columns(2)
     colors = ["#FFCDD2","#C8E6C9","#BBDEFB","#FFF9C4","#D1C4E9"]  # color palette
+    rerun_needed = False  # flag to rerun safely
+
     for i, topic in enumerate(st.session_state.data.keys()):
         col = cols[i % 2]
         color = colors[i % len(colors)]
         with col:
             if st.button(f"📂 {topic}", key=f"topic_{i}"):
                 st.session_state.selected_topic = topic
-                st.experimental_rerun()
+                rerun_needed = True
             st.markdown(
                 f"<div style='background-color:{color};border-radius:10px;padding:10px;text-align:center;margin-top:5px;color:black'>{topic}</div>",
                 unsafe_allow_html=True
             )
+
+    if rerun_needed:
+        st.experimental_rerun()
 
 # --- Display Selected Topic ---
 else:
@@ -108,6 +113,7 @@ else:
         st.session_state.content_input = st.text_area("Verse Content", st.session_state.content_input)
         st.session_state.note_input = st.text_area("Personal Note", st.session_state.note_input)
 
+        add_rerun = False
         if st.button("💾 Save Verse"):
             if st.session_state.title_input and st.session_state.content_input:
                 st.session_state.data[topic].append({
@@ -122,10 +128,13 @@ else:
                 st.session_state.content_input = ""
                 st.session_state.note_input = ""
                 st.success("Verse added!")
-                st.experimental_rerun()
+                add_rerun = True
+
+        if add_rerun:
+            st.experimental_rerun()
 
     # --- Display Existing Verses ---
-    rerun_needed = False  # flag for safe rerun
+    rerun_needed = False
     st.subheader("📄 Verses")
     for i, verse in enumerate(st.session_state.data[topic]):
         with st.container():
