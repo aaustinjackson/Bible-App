@@ -1,1 +1,55 @@
-{}
+{
+  "Abortion": [
+    {
+      "title": "Jeremiah 1:5",
+      "content": "Before I formed you in the womb I knew you, before you were born I set you apart...",
+      "note": "God knows and values life even before birth."
+    },
+    {
+      "title": "Psalm 139:13-16",
+      "content": "For you created my inmost being; you knit me together in my mother’s womb. I praise you because I am fearfully and wonderfully made...",
+      "note": "A reminder of the sanctity of life and God's intricate design."
+    },
+    {
+      "title": "Exodus 20:13",
+      "content": "You shall not murder.",
+      "note": "An overarching principle of the value of human life."
+    }
+  ],
+
+  "LGBT": [
+    {
+      "title": "Leviticus 18:22",
+      "content": "Do not have sexual relations with a man as one does with a woman; that is detestable.",
+      "note": ""
+    },
+    {
+      "title": "Leviticus 20:13",
+      "content": "If a man has sexual relations with a man as one does with a woman, both of them have done what is detestable. They must be put to death; their blood will be on their own heads.",
+      "note": ""
+    },
+    {
+      "title": "Romans 1:26-27",
+      "content": "Because of this, God gave them over to shameful lusts. Even their women exchanged natural sexual relations for unnatural ones. In the same way the men also abandoned natural relations with women and were inflamed with lust for one another, men committing shameful acts with men and receiving in themselves the due penalty for their error.",
+      "note": ""
+    }
+  ],
+
+  "WhyDoesGodLetBadThingsHappen": [
+    {
+      "title": "Romans 8:28",
+      "content": "And we know that in all things God works for the good of those who love him, who have been called according to his purpose.",
+      "note": "God can bring good even from suffering."
+    },
+    {
+      "title": "James 1:2-4",
+      "content": "Consider it pure joy, my brothers and sisters, whenever you face trials of many kinds, because you know that the testing of your faith produces perseverance.",
+      "note": "Trials develop spiritual maturity."
+    },
+    {
+      "title": "Job 1:21",
+      "content": "The Lord gave and the Lord has taken away; may the name of the Lord be praised.",
+      "note": "Even in loss, we can trust God's sovereignty."
+    }
+  ]
+}
