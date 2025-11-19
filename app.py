@@ -89,28 +89,14 @@ if st.session_state.selected_topic == "":
         col = cols[i % 2]
         color = colors[i % len(colors)]
         with col:
-            # Fully clickable folder card button
-            if st.button(topic, key=f"topic_{i}"):
-                st.session_state.selected_topic = topic
+            # Visual card
             st.markdown(
-                f"""
-                <style>
-                div.stButton > button:first-child {{
-                    width: 100%;
-                    background-color: {color};
-                    padding: 25px;
-                    border-radius: 10px;
-                    font-size: 18px;
-                    font-weight: bold;
-                    color: black;
-                }}
-                div.stButton > button:first-child:hover {{
-                    background-color: #e0f7fa;
-                }}
-                </style>
-                """,
+                f"<div style='background-color:{color};border-radius:10px;padding:25px;text-align:center;font-size:18px;font-weight:bold;color:black;margin-bottom:5px'>{topic}</div>",
                 unsafe_allow_html=True
             )
+            # Functional button (invisible text)
+            if st.button(f"Open {topic}", key=f"topic_{i}"):
+                st.session_state.selected_topic = topic
 
 # --- Display Selected Topic ---
 else:
