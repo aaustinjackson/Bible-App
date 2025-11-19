@@ -4,7 +4,7 @@ import os
 
 JSON_FILE = "verses.json"
 
-# Load data
+# --- Load data ---
 if os.path.exists(JSON_FILE):
     with open(JSON_FILE, "r") as f:
         data = json.load(f)
@@ -14,27 +14,15 @@ else:
 if "data" not in st.session_state:
     st.session_state.data = data
 
-if "selected_topic" not in st.session_state:
-    st.session_state.selected_topic = ""
-
-# Initialize form fields
-for topic_name in st.session_state.data.keys():
-    for key in ["title", "content", "note"]:
-        session_key = f"{key}_{topic_name}"
-        if session_key not in st.session_state:
-            st.session_state[session_key] = ""
-
 st.set_page_config(page_title="Bible Notebook", layout="wide")
 st.title("📖 Bible Notebook")
 
-# Sidebar
+# --- Sidebar ---
 st.sidebar.header("📁 Topics")
 new_topic = st.sidebar.text_input("New Topic")
 if st.sidebar.button("➕ Add Topic"):
     if new_topic and new_topic not in st.session_state.data:
         st.session_state.data[new_topic] = []
-        for key in ["title", "content", "note"]:
-            st.session_state[f"{key}_{new_topic}"] = ""
         with open(JSON_FILE, "w") as f:
             json.dump(st.session_state.data, f, indent=4)
         st.sidebar.success(f"Topic '{new_topic}' added!")
@@ -42,13 +30,12 @@ if st.sidebar.button("➕ Add Topic"):
 selected_topic = st.sidebar.selectbox(
     "Select Topic", [""] + list(st.session_state.data.keys())
 )
-st.session_state.selected_topic = selected_topic
 
-# Main page
+# --- Main page ---
 st.subheader("Topics")
 
 for topic_name in st.session_state.data.keys():
-    with st.expander(topic_name, expanded=(topic_name == st.session_state.selected_topic)):
+    with st.expander(topic_name, expanded=(topic_name == selected_topic)):
         # Display existing verses
         verses = st.session_state.data[topic_name]
         for i, verse in enumerate(verses):
@@ -56,19 +43,19 @@ for topic_name in st.session_state.data.keys():
             st.markdown(verse['content'])
             if verse['note']:
                 st.markdown(f"_Note: {verse['note']}_")
-
-            # Delete button (works without experimental_rerun)
+            
+            # Delete button
             if st.button(f"🗑 Delete {verse['title']}", key=f"del_{topic_name}_{i}"):
                 st.session_state.data[topic_name].pop(i)
                 with open(JSON_FILE, "w") as f:
                     json.dump(st.session_state.data, f, indent=4)
                 st.success(f"Deleted verse: {verse['title']}")
 
-        # Add new verse
+        # Add new verse form (use local variables, not session_state)
         with st.form(f"add_verse_form_{topic_name}"):
-            title = st.text_input("Verse Title / Reference", key=f"title_{topic_name}")
-            content = st.text_area("Verse Content", key=f"content_{topic_name}")
-            note = st.text_area("Personal Note", key=f"note_{topic_name}")
+            title = st.text_input("Verse Title / Reference")
+            content = st.text_area("Verse Content")
+            note = st.text_area("Personal Note")
             submitted = st.form_submit_button("💾 Save Verse")
             if submitted and title and content:
                 st.session_state.data[topic_name].append({
@@ -78,8 +65,4 @@ for topic_name in st.session_state.data.keys():
                 })
                 with open(JSON_FILE, "w") as f:
                     json.dump(st.session_state.data, f, indent=4)
-                # Clear inputs safely
-                st.session_state[f"title_{topic_name}"] = ""
-                st.session_state[f"content_{topic_name}"] = ""
-                st.session_state[f"note_{topic_name}"] = ""
                 st.success(f"Verse '{title}' added!")
