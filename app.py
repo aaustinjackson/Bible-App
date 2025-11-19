@@ -76,6 +76,9 @@ selected = st.sidebar.selectbox(
 )
 if selected != st.session_state.selected_topic:
     st.session_state.selected_topic = selected
+    rerun_flag = True
+else:
+    rerun_flag = False
 
 # --- Main App ---
 st.title("📖 Bible Notebook")
@@ -85,7 +88,7 @@ if st.session_state.selected_topic == "":
     st.subheader("Topics")
     cols = st.columns(2)
     colors = ["#FFCDD2","#C8E6C9","#BBDEFB","#FFF9C4","#D1C4E9"]  # color palette
-    rerun_needed = False  # flag to rerun safely
+    folder_rerun_flag = False
 
     for i, topic in enumerate(st.session_state.data.keys()):
         col = cols[i % 2]
@@ -93,13 +96,13 @@ if st.session_state.selected_topic == "":
         with col:
             if st.button(f"📂 {topic}", key=f"topic_{i}"):
                 st.session_state.selected_topic = topic
-                rerun_needed = True
+                folder_rerun_flag = True
             st.markdown(
                 f"<div style='background-color:{color};border-radius:10px;padding:10px;text-align:center;margin-top:5px;color:black'>{topic}</div>",
                 unsafe_allow_html=True
             )
 
-    if rerun_needed:
+    if folder_rerun_flag:
         st.experimental_rerun()
 
 # --- Display Selected Topic ---
@@ -113,7 +116,7 @@ else:
         st.session_state.content_input = st.text_area("Verse Content", st.session_state.content_input)
         st.session_state.note_input = st.text_area("Personal Note", st.session_state.note_input)
 
-        add_rerun = False
+        add_rerun_flag = False
         if st.button("💾 Save Verse"):
             if st.session_state.title_input and st.session_state.content_input:
                 st.session_state.data[topic].append({
@@ -128,13 +131,10 @@ else:
                 st.session_state.content_input = ""
                 st.session_state.note_input = ""
                 st.success("Verse added!")
-                add_rerun = True
-
-        if add_rerun:
-            st.experimental_rerun()
+                add_rerun_flag = True
 
     # --- Display Existing Verses ---
-    rerun_needed = False
+    delete_rerun_flag = False
     st.subheader("📄 Verses")
     for i, verse in enumerate(st.session_state.data[topic]):
         with st.container():
@@ -151,12 +151,14 @@ else:
                 st.session_state.data[topic].pop(i)
                 with open("verses.json", "w") as f:
                     json.dump(st.session_state.data, f, indent=4)
-                rerun_needed = True
-
-    if rerun_needed:
-        st.experimental_rerun()
+                delete_rerun_flag = True
 
     # --- Back Button ---
+    back_rerun_flag = False
     if st.button("⬅ Back to Topics"):
         st.session_state.selected_topic = ""
+        back_rerun_flag = True
+
+    # --- Trigger Reruns Safely ---
+    if add_rerun_flag or delete_rerun_flag or back_rerun_flag or rerun_flag:
         st.experimental_rerun()
