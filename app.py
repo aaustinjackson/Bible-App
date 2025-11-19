@@ -35,13 +35,13 @@ body, .stText, .stTextArea, .stTextInput {
 # --- Load or Initialize Data ---
 if os.path.exists("verses.json"):
     with open("verses.json", "r") as f:
-        initial_data = json.load(f)
+        data = json.load(f)
 else:
-    initial_data = {}
+    data = {}
 
 # --- Session State Initialization ---
 if "data" not in st.session_state:
-    st.session_state.data = initial_data
+    st.session_state.data = data
 
 if "selected_topic" not in st.session_state:
     st.session_state.selected_topic = ""
@@ -74,11 +74,7 @@ st.sidebar.markdown("---")
 selected = st.sidebar.selectbox(
     "Select Topic", [""] + list(st.session_state.data.keys()), index=0
 )
-if selected != st.session_state.selected_topic:
-    st.session_state.selected_topic = selected
-    rerun_flag = True
-else:
-    rerun_flag = False
+st.session_state.selected_topic = selected  # update session_state on change
 
 # --- Main App ---
 st.title("📖 Bible Notebook")
@@ -88,22 +84,17 @@ if st.session_state.selected_topic == "":
     st.subheader("Topics")
     cols = st.columns(2)
     colors = ["#FFCDD2","#C8E6C9","#BBDEFB","#FFF9C4","#D1C4E9"]  # color palette
-    folder_rerun_flag = False
 
     for i, topic in enumerate(st.session_state.data.keys()):
         col = cols[i % 2]
         color = colors[i % len(colors)]
         with col:
             if st.button(f"📂 {topic}", key=f"topic_{i}"):
-                st.session_state.selected_topic = topic
-                folder_rerun_flag = True
+                st.session_state.selected_topic = topic  # simply set session state
             st.markdown(
                 f"<div style='background-color:{color};border-radius:10px;padding:10px;text-align:center;margin-top:5px;color:black'>{topic}</div>",
                 unsafe_allow_html=True
             )
-
-    if folder_rerun_flag:
-        st.experimental_rerun()
 
 # --- Display Selected Topic ---
 else:
@@ -116,7 +107,6 @@ else:
         st.session_state.content_input = st.text_area("Verse Content", st.session_state.content_input)
         st.session_state.note_input = st.text_area("Personal Note", st.session_state.note_input)
 
-        add_rerun_flag = False
         if st.button("💾 Save Verse"):
             if st.session_state.title_input and st.session_state.content_input:
                 st.session_state.data[topic].append({
@@ -131,10 +121,8 @@ else:
                 st.session_state.content_input = ""
                 st.session_state.note_input = ""
                 st.success("Verse added!")
-                add_rerun_flag = True
 
     # --- Display Existing Verses ---
-    delete_rerun_flag = False
     st.subheader("📄 Verses")
     for i, verse in enumerate(st.session_state.data[topic]):
         with st.container():
@@ -151,14 +139,7 @@ else:
                 st.session_state.data[topic].pop(i)
                 with open("verses.json", "w") as f:
                     json.dump(st.session_state.data, f, indent=4)
-                delete_rerun_flag = True
 
     # --- Back Button ---
-    back_rerun_flag = False
     if st.button("⬅ Back to Topics"):
         st.session_state.selected_topic = ""
-        back_rerun_flag = True
-
-    # --- Trigger Reruns Safely ---
-    if add_rerun_flag or delete_rerun_flag or back_rerun_flag or rerun_flag:
-        st.experimental_rerun()
