@@ -6,14 +6,14 @@ import os
 st.set_page_config(page_title="Bible Notebook", layout="wide")
 st.markdown("""
 <style>
-/* Card styling */
+/* Card styling for verses */
 .card {
     padding: 15px;
     margin-bottom: 15px;
     border-radius: 10px;
     background-color: #f5f5f5;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    color: black; /* Ensure text is black */
+    color: black;
 }
 .card:hover {
     background-color: #e0f7fa;
@@ -27,7 +27,7 @@ st.markdown("""
     color: #555;
 }
 body, .stText, .stTextArea, .stTextInput {
-    color: black !important; /* Ensure text is visible in dark mode */
+    color: black !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -74,7 +74,7 @@ st.sidebar.markdown("---")
 selected = st.sidebar.selectbox(
     "Select Topic", [""] + list(st.session_state.data.keys()), index=0
 )
-st.session_state.selected_topic = selected  # update session_state on change
+st.session_state.selected_topic = selected
 
 # --- Main App ---
 st.title("📖 Bible Notebook")
@@ -83,16 +83,32 @@ st.title("📖 Bible Notebook")
 if st.session_state.selected_topic == "":
     st.subheader("Topics")
     cols = st.columns(2)
-    colors = ["#FFCDD2","#C8E6C9","#BBDEFB","#FFF9C4","#D1C4E9"]  # color palette
+    colors = ["#FFCDD2","#C8E6C9","#BBDEFB","#FFF9C4","#D1C4E9"]
 
     for i, topic in enumerate(st.session_state.data.keys()):
         col = cols[i % 2]
         color = colors[i % len(colors)]
         with col:
-            if st.button(f"📂 {topic}", key=f"topic_{i}"):
-                st.session_state.selected_topic = topic  # simply set session state
+            # Fully clickable folder card button
+            if st.button(topic, key=f"topic_{i}"):
+                st.session_state.selected_topic = topic
             st.markdown(
-                f"<div style='background-color:{color};border-radius:10px;padding:10px;text-align:center;margin-top:5px;color:black'>{topic}</div>",
+                f"""
+                <style>
+                div.stButton > button:first-child {{
+                    width: 100%;
+                    background-color: {color};
+                    padding: 25px;
+                    border-radius: 10px;
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: black;
+                }}
+                div.stButton > button:first-child:hover {{
+                    background-color: #e0f7fa;
+                }}
+                </style>
+                """,
                 unsafe_allow_html=True
             )
 
