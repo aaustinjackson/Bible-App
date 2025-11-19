@@ -39,6 +39,7 @@ if os.path.exists("verses.json"):
 else:
     initial_data = {}
 
+# --- Session State Initialization ---
 if "data" not in st.session_state:
     st.session_state.data = initial_data
 
@@ -54,6 +55,8 @@ if "note_input" not in st.session_state:
 
 # --- Sidebar: Topic Management ---
 st.sidebar.header("📁 Topics")
+
+# Add new topic
 new_topic = st.sidebar.text_input("New Topic")
 if st.sidebar.button("➕ Add Topic"):
     if new_topic:
@@ -67,6 +70,13 @@ if st.sidebar.button("➕ Add Topic"):
 
 st.sidebar.markdown("---")
 
+# Sidebar selectbox for topic
+selected = st.sidebar.selectbox(
+    "Select Topic", [""] + list(st.session_state.data.keys()), index=0
+)
+if selected != st.session_state.selected_topic:
+    st.session_state.selected_topic = selected
+
 # --- Main App ---
 st.title("📖 Bible Notebook")
 
@@ -79,11 +89,13 @@ if st.session_state.selected_topic == "":
         col = cols[i % 2]
         color = colors[i % len(colors)]
         with col:
-            # Use button to select topic via session_state
             if st.button(f"📂 {topic}", key=f"topic_{i}"):
                 st.session_state.selected_topic = topic
-                st.experimental_rerun()  # Refresh app immediately to show folder content
-            st.markdown(f"<div style='background-color:{color};border-radius:10px;padding:10px;text-align:center;margin-top:5px;color:black'>{topic}</div>", unsafe_allow_html=True)
+                st.experimental_rerun()
+            st.markdown(
+                f"<div style='background-color:{color};border-radius:10px;padding:10px;text-align:center;margin-top:5px;color:black'>{topic}</div>",
+                unsafe_allow_html=True
+            )
 
 # --- Display Selected Topic ---
 else:
@@ -113,6 +125,7 @@ else:
                 st.experimental_rerun()
 
     # --- Display Existing Verses ---
+    rerun_needed = False  # flag for safe rerun
     st.subheader("📄 Verses")
     for i, verse in enumerate(st.session_state.data[topic]):
         with st.container():
@@ -125,12 +138,14 @@ else:
             else:
                 st.markdown("</div>", unsafe_allow_html=True)
 
-            # Delete button
             if st.button(f"🗑 Delete {verse['title']}", key=f"del_{i}"):
                 st.session_state.data[topic].pop(i)
                 with open("verses.json", "w") as f:
                     json.dump(st.session_state.data, f, indent=4)
-                st.experimental_rerun()
+                rerun_needed = True
+
+    if rerun_needed:
+        st.experimental_rerun()
 
     # --- Back Button ---
     if st.button("⬅ Back to Topics"):
